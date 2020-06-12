@@ -1,5 +1,6 @@
 import './style.scss'
 import ModalVanilla from 'modal-vanilla'
+import ajax from '@codexteam/ajax';
 
 export default class HistoryModal {
 
@@ -191,11 +192,11 @@ export default class HistoryModal {
   }
 
   _hideBtn(node) {
-    node && node.classList.add('d-none')
+    node && (node.hidden = true)
   }
 
   _showBtn(node) {
-    node && node.classList.remove('d-none')
+    node && (node.hidden = false)
   }
 
   showErrorText(text) {
@@ -284,27 +285,23 @@ export default class HistoryModal {
       page: nextPage || 1,
       per_page: 10,
     }
-    $.ajax({
+    ajax.request({
       url: self.linkSourceUrl,
       method: 'get',
       data: params,
       headers: {
         Accept: 'application/json,text/plain'
-      },
-      success: function (response) {
-        if (response.status === 'ok') {
-          self._success(response.message)
-        } else {
-          self._failed()
-        }
-      },
-      error: function (e) {
-        self._failed()
-      },
-      complete: function () {
-        self.loading = false
-        self.nodes.linkSourceMoreBtn.textContent = '点击加载更多'
       }
+    }).then(({ body }) => {
+      self.loading = false
+      if (body.status === 'ok') {
+        self._success(body.message)
+      } else {
+        self._failed()
+      }
+    }).catch(() => {
+      self.loading = false
+      self._failed()
     })
   }
 
@@ -321,9 +318,11 @@ export default class HistoryModal {
     items.forEach(item => {
       this.addItem(item)
     })
+    this.nodes.linkSourceMoreBtn.textContent = '点击加载更多'
   }
 
   _failed() {
+    this.nodes.linkSourceMoreBtn.textContent = '点击加载更多'
     console.log('加载失败了');
   }
 

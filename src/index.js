@@ -29,8 +29,7 @@ export default class InlineLink {
         linkSourceUrl: this.config.linkSourceUrl,
         onSubmitCallback: (title, url) => {
           self.modalChangeLink = true
-          console.log('onSubmitCallback')
-          // self.editedRange = null
+          self.editedRange = null
           self._successSubmitSource(title, url)
           self.isOpenModal = false
         },
@@ -48,7 +47,7 @@ export default class InlineLink {
 
   }
 
-  _successSubmitSource(title = '', url = '') {
+  _successSubmitSource(title = '', url = '', skip_validate = false) {
     if (!url.trim()) {
       this.selectionUtil.restore();
       this.unlink();
@@ -163,8 +162,6 @@ export default class InlineLink {
   }
 
   surround(range) {
-    console.warn('surround', range.toString());
-
     if (!range) return
 
     /**
@@ -325,7 +322,7 @@ export default class InlineLink {
     /**
      * If protocol already exists, do nothing
      */
-    if (/^(\w+):(\/\/)?/.test(link)) {
+    if (/^(https?:\/\/|\/)[^\/].*/.test(link)) {
       return link;
     }
 

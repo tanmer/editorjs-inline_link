@@ -789,6 +789,11 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
+"@codexteam/ajax@^4.1.0":
+  version "4.1.0"
+  resolved "https://registry.npm.taobao.org/@codexteam/ajax/download/@codexteam/ajax-4.1.0.tgz#472703b7c1e0843eec1f047b849835e0554c34a5"
+  integrity sha1-RycDt8HghD7sHwR7hJg14FVMNKU=
+
 "@types/json-schema@^7.0.4":
   version "7.0.5"
   resolved "https://registry.npm.taobao.org/@types/json-schema/download/@types/json-schema-7.0.5.tgz?cache=0&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Fjson-schema%2Fdownload%2F%40types%2Fjson-schema-7.0.5.tgz#dcce4430e64b443ba8945f0290fb564ad5bac6dd"
