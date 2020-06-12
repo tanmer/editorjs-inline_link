@@ -63,7 +63,7 @@ export default class HistoryModal {
 
     this.modalRef = new ModalVanilla({ el: this.nodes.modal })
     this.modalRef.on('hidden', () => {
-      this.onCloseCallback(this.clearTitle)
+      this.onCloseCallback()
       this.nodes.linkSourceInnerBlock.innerHTML = ''
     })
     document.body.appendChild(this.nodes.modal)
@@ -102,9 +102,8 @@ export default class HistoryModal {
     const self = this
     dom.addEventListener('click', function () {
       const { title, url } = self.getLinkInput()
-      self.clearTitle = false
-      self.onSubmitCallback(title, url)
       self.close()
+      self.onSubmitCallback(title, url, self.rangeOptions)
     })
     return dom
   }
@@ -260,8 +259,8 @@ export default class HistoryModal {
     return this.nodes.modal
   }
 
-  open(title, url, clearTitle = false) {
-    this.clearTitle = clearTitle
+  open(rangeOptions, title, url) {
+    this.rangeOptions = rangeOptions
     this._getData()
     this.modalRef.show()
     this.setLinkInput(title, url)

@@ -27,19 +27,14 @@ export default class InlineLink {
       let self = this
       this.linkModalExp = new LinkModal({
         linkSourceUrl: this.config.linkSourceUrl,
-        onSubmitCallback: (title, url) => {
-          self.modalChangeLink = true
-          self.editedRange = null
+        onSubmitCallback: (title, url, rangeOptions) => {
+          self.selectionUtil.savedSelectionRange.setStart(rangeOptions.startContainer, rangeOptions.startOffset)
+          self.selectionUtil.savedSelectionRange.setEnd(rangeOptions.endContainer, rangeOptions.endOffset)
+
           self._successSubmitSource(title, url)
           self.isOpenModal = false
         },
-        onCloseCallback: (clearTitle) => {
-          console.log('onCloseCallback', clearTitle)
-          if (clearTitle && self.modalCacheTitle) {
-            const fragment = document.createDocumentFragment()
-            fragment.append(self.modalCacheTitle)
-            self.selectionUtil.savedSelectionRange.insertNode(fragment)
-          }
+        onCloseCallback: () => {
           self.isOpenModal = false
         }
       })
@@ -47,7 +42,7 @@ export default class InlineLink {
 
   }
 
-  _successSubmitSource(title = '', url = '', skip_validate = false) {
+  _successSubmitSource(title = '', url = '') {
     if (!url.trim()) {
       this.selectionUtil.restore();
       this.unlink();
@@ -139,19 +134,50 @@ export default class InlineLink {
         if (rg && str) {
           self.selectionUtil.restore();
           const anchorTag = self.selection.findParentTag('A')
-
           self.isOpenModal = true
-          self.modalCacheTitle = null
+          let rangeOptions = {
+            startContainer: rg.startContainer,
+            endContainer: rg.endContainer,
+            startOffset: rg.startOffset,
+            endOffset: rg.endOffset,
+            contents: rg.cloneContents()
+          }
           if (anchorTag) {
-            str = rg.toString()
-            self.editedRange = rg.cloneRange()
-            self.linkModalExp.open(str, anchorTag.getAttribute('href') || '')
+            let changeStart = false
+            let changeEnd = false
+            if (rg.startContainer.parentNode && rg.startContainer.parentNode.tagName == 'A') {
+              changeStart = true
+              self.selectionUtil.savedSelectionRange.setStart(rg.startContainer.parentNode, 0)
+            }
+
+            if (rg.endContainer.parentNode && rg.endContainer.parentNode.tagName == 'A') {
+              changeEnd = true
+              self.selectionUtil.savedSelectionRange.setEnd(rg.endContainer.parentNode, 1)
+            }
+
+            if (changeStart != changeEnd) {
+              if (changeStart) {
+                self.selectionUtil.savedSelectionRange.setEnd(rangeOptions.endContainer, rangeOptions.endOffset)
+              }
+              if (changeEnd) {
+                self.selectionUtil.savedSelectionRange.setStart(rangeOptions.startContainer, rangeOptions.startOffset)
+              }
+            }
+
+            rangeOptions = {
+              startContainer: rg.startContainer,
+              endContainer: rg.endContainer,
+              startOffset: rg.startOffset,
+              endOffset: rg.endOffset,
+              contents: rg.cloneContents()
+            }
+
+            str = rg.toString() // reget selected string
+            self.linkModalExp.open(rangeOptions, str, anchorTag.getAttribute('href') || '')
           } else {
             self.modalCacheTitle = str
             self.selectionUtil.removeFakeBackground();
-            self.selectionUtil.save();
-            self.selectionUtil.savedSelectionRange.deleteContents()
-            self.linkModalExp.open(str, '', true)
+            self.linkModalExp.open(rangeOptions, str, '')
           }
         }
       })
