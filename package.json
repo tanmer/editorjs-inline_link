@@ -1,6 +1,6 @@
 {
   "name": "editorjs-inline_link",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Inlinelink Tool for Editor.js",
   "main": "./dist/bundle.js",
   "scripts": {

@@ -384,9 +384,9 @@ export default class InlineLink {
         const fragment = document.createDocumentFragment()
         fragment.append(title)
         this.selectionUtil.savedSelectionRange.insertNode(fragment)
+        this.selectionUtil.restore()
       }
     }
-    this.selectionUtil.restore()
 
     if (anchorTag) {
       this.selection.expandToTag(anchorTag);
