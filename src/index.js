@@ -386,6 +386,7 @@ export default class InlineLink {
         this.selectionUtil.savedSelectionRange.insertNode(fragment)
       }
     }
+    this.selectionUtil.restore()
 
     if (anchorTag) {
       this.selection.expandToTag(anchorTag);
