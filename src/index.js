@@ -345,6 +345,9 @@ export default class InlineLink {
   }
 
   addProtocol(link) {
+    // link is null
+    if (!link) return link;
+
     /**
      * If protocol already exists, do nothing
      */
