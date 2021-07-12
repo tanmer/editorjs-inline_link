@@ -43,33 +43,10 @@ export default class InlineLink {
   }
 
   _successSubmitSource(title = '', url = '') {
-    if (!url.trim()) {
-      this.selectionUtil.restore();
-      this.unlink();
-      event.preventDefault();
-      this.closeActions();
-    }
-
-    if (!this.validateURL(url)) {
-      this.notifier.show({
-        message: 'Pasted link is not valid.',
-        style: 'error',
-      });
-
-      return;
-    }
-
-    url = this.prepareLink(url);
-
-    // // const selectedText = self.savedSelectionRange.extractContents()
-    this.selectionUtil.restore();
-    this.insertLink(url, title);
-
-    event.preventDefault();
-    event.stopPropagation();
-    event.stopImmediatePropagation();
-    this.selectionUtil.collapseToEnd();
-    this.inlineToolbar.close();
+    this.nodes.input.value = url;
+    this.enterPressed(null, title)
+    // 主动修改值后未触发onChange事件，所以更改editorjs公开onChange事件，主动触发
+    this.api.ModificationsObserver.onChange()
   }
 
   render() {
@@ -101,6 +78,7 @@ export default class InlineLink {
     this.nodes.input.addEventListener('keydown', (event) => {
       if (event.keyCode === this.ENTER_KEY) {
         this.enterPressed(event);
+        console.log(event);
       }
     });
 
@@ -294,13 +272,13 @@ export default class InlineLink {
     this.inputOpened = false;
   }
 
-  enterPressed(event) {
+  enterPressed(event, title = '') {
     let value = this.nodes.input.value || '';
 
     if (!value.trim()) {
       this.selectionUtil.restore();
       this.unlink();
-      event.preventDefault();
+      event && event.preventDefault();
       this.closeActions();
     }
 
@@ -318,14 +296,16 @@ export default class InlineLink {
     this.selectionUtil.restore();
     this.selectionUtil.removeFakeBackground();
 
-    this.insertLink(value);
+    this.insertLink(value, title);
 
     /**
      * Preventing events that will be able to happen
      */
-    event.preventDefault();
-    event.stopPropagation();
-    event.stopImmediatePropagation();
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+    }
     this.selectionUtil.collapseToEnd();
     this.inlineToolbar.close();
   }

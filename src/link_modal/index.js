@@ -23,7 +23,6 @@ export default class HistoryModal {
 
     this.nodes = {}
     this.meta = {}
-    this._init()
 
     // open view get data
     // this.historyInfo = {
@@ -262,15 +261,13 @@ export default class HistoryModal {
   open(rangeOptions, title, url) {
     this.rangeOptions = rangeOptions
     this._getData()
+    this._init()
     this.modalRef.show()
     this.setLinkInput(title, url)
   }
 
   close() {
     this.modalRef.hide()
-  }
-
-  destroy() {
     this.nodes.modal.remove()
   }
 
