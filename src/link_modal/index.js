@@ -119,7 +119,7 @@ export default class HistoryModal {
   _createLoadMoreBtn() {
     const self = this
     const dom = this._make('div', 'link-modal__load-more-btn')
-    dom.textContent = '点击加载更多'
+    dom.textContent = ''
     dom.addEventListener('click', function () {
 
       const { current_page = 1, total_pages = 0 } = self.meta
@@ -127,7 +127,7 @@ export default class HistoryModal {
       if (nextPage > total_pages) return
 
       self._getData(nextPage)
-      dom.textContent = '加载中...'
+      dom.textContent = ''
       // dom.innerHTML
     })
     return dom
@@ -167,6 +167,7 @@ export default class HistoryModal {
       linkSourceLabel: this._make('label', ''),
       linkSourceInnerBlock: this._make('div', ''),
       linkSourceMoreBtn: this._createLoadMoreBtn(),
+      linkSourceLoading: this._make('div', 'text-center'),
       linkSourceSearchInput: this._make('input', 'link-modal__search-input'),
       ...this._createSearchBlock()
     }
@@ -176,6 +177,10 @@ export default class HistoryModal {
     nodes.linkSourceWrapperBlock.appendChild(nodes.linkSourceSearchWrapperBlock)
     nodes.linkSourceWrapperBlock.appendChild(nodes.linkSourceInnerBlock)
     nodes.linkSourceWrapperBlock.appendChild(nodes.linkSourceMoreBtn)
+
+    nodes.linkSourceLoading.textContent = '加载中...'
+    this._displayNode(nodes.linkSourceLoading, false)
+    nodes.linkSourceWrapperBlock.appendChild(nodes.linkSourceLoading)
 
     return nodes
   }
@@ -198,7 +203,7 @@ export default class HistoryModal {
     nodes.linkSourceSearchButtonBlock.appendChild(nodes.linkSourceSearchButton)
     nodes.linkSourceSearchWrapperBlock.appendChild(nodes.linkSourceSearchButtonBlock)
 
-    nodes.linkSourceSearchButton.addEventListener('click', this.onRefetch)
+    nodes.linkSourceSearchButton.addEventListener('click', () => this.onRefetch())
     nodes.linkSourceSearchInput.addEventListener('keydown', (e) => {
       if (e.keyCode === 13) this.onRefetch()
     })
@@ -223,12 +228,8 @@ export default class HistoryModal {
     }
   }
 
-  _hideBtn(node) {
-    node && (node.hidden = true)
-  }
-
-  _showBtn(node) {
-    node && (node.hidden = false)
+  _displayNode(node, visible) {
+    node && (node.hidden = !visible)
   }
 
   showErrorText(text) {
@@ -298,8 +299,8 @@ export default class HistoryModal {
 
   open(rangeOptions, title, url) {
     this.rangeOptions = rangeOptions
-    this._getData()
     this._init()
+    this._getData()
     this.modalRef.show()
     this.setLinkInput(title, url)
   }
@@ -311,6 +312,7 @@ export default class HistoryModal {
 
   onRefetch() {
     this.nodes.linkSourceMoreBtn.textContent = ''
+    this.nodes.linkSourceSearchButton.disabled = true
     this._clearItems()
     this._getData(1)
   }
@@ -319,6 +321,7 @@ export default class HistoryModal {
     if (!this.linkSourceUrl) return
     if (this.loading) return
     this.loading = true
+    this._displayNode(this.nodes.linkSourceLoading, true)
 
     const self = this
     const params = {
@@ -344,6 +347,9 @@ export default class HistoryModal {
     }).catch(() => {
       self.loading = false
       self._failed()
+    }).finally(() => {
+      this.nodes.linkSourceSearchButton.disabled = false
+      this._displayNode(this.nodes.linkSourceLoading, false)
     })
   }
 
@@ -351,11 +357,11 @@ export default class HistoryModal {
     const { current_page, total_count, total_pages } = meta
     this.meta = { current_page, total_count, total_pages }
     if (total_pages === 0) {
-      this._hideBtn(this.nodes.linkSourceMoreBtn)
+      this._displayNode(this.nodes.linkSourceMoreBtn, false)
       this._showNodataView()
     }
     if (current_page === total_pages) {
-      this._hideBtn(this.nodes.linkSourceMoreBtn)
+      this._displayNode(this.nodes.linkSourceMoreBtn, false)
     }
     items.forEach(item => {
       this.addItem(item)
