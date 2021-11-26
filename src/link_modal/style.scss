@@ -46,9 +46,10 @@
     }
     &__description {
     }
-    &.active {
+    &.active, &:hover {
       background: rgba(3, 201, 169, 0.15);
       border-radius: 5px;
+      ursor: pointer;
     }
   }
 

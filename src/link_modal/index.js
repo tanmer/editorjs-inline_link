@@ -162,19 +162,53 @@ export default class HistoryModal {
   }
 
   _createLinkSourceBlocks() {
-    const nodes = {
+    let nodes = {
       linkSourceWrapperBlock: this._make('div', ''),
       linkSourceLabel: this._make('label', ''),
       linkSourceInnerBlock: this._make('div', ''),
       linkSourceMoreBtn: this._createLoadMoreBtn(),
+      linkSourceSearchInput: this._make('input', 'link-modal__search-input'),
+      ...this._createSearchBlock()
     }
 
     nodes.linkSourceLabel.textContent = '站点文章'
     nodes.linkSourceWrapperBlock.appendChild(nodes.linkSourceLabel)
+    nodes.linkSourceWrapperBlock.appendChild(nodes.linkSourceSearchWrapperBlock)
     nodes.linkSourceWrapperBlock.appendChild(nodes.linkSourceInnerBlock)
     nodes.linkSourceWrapperBlock.appendChild(nodes.linkSourceMoreBtn)
 
     return nodes
+  }
+
+  _createSearchBlock() {
+    const nodes = {
+      linkSourceSearchWrapperBlock: this._make('div', ['input-group', 'mb-3']),
+      linkSourceSearchInput: this._make('input', ['link-modal__search-input', 'form-control'], {
+        placeholder: '',
+        type: 'text'
+      }),
+      linkSourceSearchButtonBlock: this._make('div', 'input-group-append'),
+      linkSourceSearchButton: this._make('button', ['btn', 'btn-outline-secondary'], {
+        type: 'button'
+      })
+    }
+
+    nodes.linkSourceSearchWrapperBlock.appendChild(nodes.linkSourceSearchInput)
+    nodes.linkSourceSearchButton.innerText = '搜索'
+    nodes.linkSourceSearchButtonBlock.appendChild(nodes.linkSourceSearchButton)
+    nodes.linkSourceSearchWrapperBlock.appendChild(nodes.linkSourceSearchButtonBlock)
+
+    nodes.linkSourceSearchButton.addEventListener('click', this.onRefetch)
+    nodes.linkSourceSearchInput.addEventListener('keydown', (e) => {
+      if (e.keyCode === 13) this.onRefetch()
+    })
+
+    return nodes
+  }
+
+  _getSearchKeywords() {
+    const inputDom = this.nodes.linkSourceSearchInput
+    return inputDom && inputDom.value || null
   }
 
   _showNodataView() {
@@ -206,6 +240,10 @@ export default class HistoryModal {
     this.errorTimeout = setTimeout(() => {
       this.nodes.errorText.textContent = ''
     }, 2000);
+  }
+
+  _clearItems() {
+    this.nodes.linkSourceInnerBlock.innerHTML = null
   }
 
   addItem({ id, path, name, channel_breadcrumb = []}) {
@@ -271,6 +309,12 @@ export default class HistoryModal {
     this.nodes.modal.remove()
   }
 
+  onRefetch() {
+    this.nodes.linkSourceMoreBtn.textContent = ''
+    this._clearItems()
+    this._getData(1)
+  }
+
   _getData(nextPage) {
     if (!this.linkSourceUrl) return
     if (this.loading) return
@@ -280,7 +324,9 @@ export default class HistoryModal {
     const params = {
       page: nextPage || 1,
       per_page: 10,
+      keywords: this._getSearchKeywords()
     }
+
     ajax.request({
       url: self.linkSourceUrl,
       method: 'get',
