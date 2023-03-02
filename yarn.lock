@@ -873,6 +873,11 @@
   resolved "https://registry.npmmirror.com/@codexteam/ajax/download/@codexteam/ajax-4.2.0.tgz#f89faecbaf8cd496bfd77ef20a7fe99ee20ca9a3"
   integrity sha1-+J+uy6+M1Ja/137yCn/pnuIMqaM=
 
+"@codexteam/icons@^0.2.0":
+  version "0.2.0"
+  resolved "https://registry.npmmirror.com/@codexteam/icons/-/icons-0.2.0.tgz#749e8fdd560d332bd06e7b798cdb53e41d3e88f3"
+  integrity sha512-v6ICziqFGHv9Pzcn5Pib799AHBxsD/0s3QoRC6y/ZUHGtogq4HeV4Nzd8C2wTWrbYoZE2BcksFCMEM1xTZEEXA==
+
 "@types/json-schema@^7.0.5", "@types/json-schema@^7.0.8":
   version "7.0.9"
   resolved "https://registry.nlark.com/@types/json-schema/download/@types/json-schema-7.0.9.tgz?cache=0&sync_timestamp=1629708365672&other_urls=https%3A%2F%2Fregistry.nlark.com%2F%40types%2Fjson-schema%2Fdownload%2F%40types%2Fjson-schema-7.0.9.tgz#97edc9037ea0c38585320b28964dde3b39e4660d"
